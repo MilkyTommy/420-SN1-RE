@@ -20,10 +20,10 @@ def getAnwsersFromAFile(filename, isHeaderRequired = False) -> list[str]:
                 'lastname' : df.iloc[1,2],
                 'id' : df.iloc[1,3],
                 'group' : df.iloc[1,4],
-                'score' : anwsers
+                'anwsers' : anwsers
                 }
 
-    return {'score' : anwsers}
+    return {'anwsers' : anwsers}
 
 def getSingleScore(input_filename, output_filename)-> dict:
     total = 0
@@ -32,9 +32,9 @@ def getSingleScore(input_filename, output_filename)-> dict:
     correctedAnwsers = getAnwsersFromAFile(output_filename)
 
     for i in range(0,max_score) :
-        total += int(anwsers['score'][i] == correctedAnwsers['score'][i])
-    
-    anwsers['score'] = total
+        total += int(anwsers['anwsers'][i] == correctedAnwsers['anwsers'][i])
+
+    anwsers['total'] = total
     return anwsers
 
 def writeAnwsersToFile(data, filename) -> str :
@@ -52,7 +52,8 @@ if __name__ == '__main__':
     parser.add_argument("-s","--score", help="Choos max score",type=int)
     parser.add_argument("type", help="Choose between solo or all files",type=str, choices=["single","all"])
     parser.add_argument("-i", "--input", help="select a input file")
-    parser.add_argument("-o", "--output", help="select a output file")
+    parser.add_argument("-a", "--anwser", help="select a anwser file")
+    parser.add_argument("-o", "--output", help="Choose a output file")
     args = parser.parse_args()
 
     if args.score :
@@ -61,15 +62,26 @@ if __name__ == '__main__':
         max_score = DEFAULT_SCORE
 
     if args.type == "single" :
-        if args.input and args.output:
-            student = getSingleScore(args.input, args.output)
+        if args.input and args.anwser:
+            student = getSingleScore(args.input, args.anwser)
+            if args.output :
+                finalOutput = {
+                    'Nom' : [str(student['firstname']) + ' ' + str(student['lastname'])],
+                    'DA' : [student['id']],
+                    'Groupe' : [student['group']],
+                    'Réponses' : ' ' .join(student['anwsers']),
+                    'Score Total' : [student['total']]
+                }
 
-            print("Nom :",student['firstname'],student['lastname']) 
-            print("DA :", student['id'])
-            print("Groupe :", student['group'])
-            print("Score :",student['score'],"/",max_score)
+                writeAnwsersToFile(finalOutput,str(args.output))
+            else : 
+                print("Nom :",student['firstname'] + ' ' +student['lastname']) 
+                print("DA :", student['id'])
+                print("Groupe :", student['group'])
+                print("réponses :", student['anwsers'])
+                print("Score :",student['total'],"/",max_score)
         else :
-            parser.error("single requires --input and --output.")         
+            parser.error("single requires --input and --anwser.")         
     elif args.type =="all" :
         filename = os.chdir(PATH_OF_SCRIPT + "/solution/")
         correct_anwsers = []
@@ -87,14 +99,14 @@ if __name__ == '__main__':
         for filename in glob.glob("*.xlsx"):
             anwsers =getAnwsersFromAFile(filename,True)
 
-            nom.append(anwsers['firstname'] + ' ' + anwsers['lastname'])
+            nom.append(str(anwsers['firstname']) + ' ' + str(anwsers['lastname']))
             id.append(anwsers['id'])
             groupe.append(anwsers['group'])
-            anwsersOfSingleStudent.append(' '.join(anwsers['score']))
+            anwsersOfSingleStudent.append(' '.join(anwsers['anwsers']))
             total = 0
 
             for i in range(0, max_score) :
-                total += int(anwsers['score'][i] == correct_anwsers['score'][i])
+                total += int(anwsers['anwsers'][i] == correct_anwsers['anwsers'][i])
 
             totalOfSingleStudent.append(total)
             
@@ -106,4 +118,8 @@ if __name__ == '__main__':
             'Réponses' : anwsersOfSingleStudent,
             'Score Total' : totalOfSingleStudent
         }
-        print(writeAnwsersToFile(finalOutput,'AllStudent'))
+
+        if args.output :
+            writeAnwsersToFile(finalOutput,'../' + str(args.output))
+        else :
+            print(finalOutput)
