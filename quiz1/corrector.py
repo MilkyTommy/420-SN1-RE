@@ -25,16 +25,25 @@ def getAnwsersFromAFile(filename, isHeaderRequired = False) -> list[str]:
 
     return {'anwsers' : anwsers}
 
-def getSingleScore(input_filename, output_filename)-> dict:
+def getTotalFromAnwsers(input, output) -> int:
     total = 0
 
+    for i in range(0, max_score) :
+        # Tranform the Weird behaviour that Sometimes, 'Vrai' and 'Faux' are translate by True and False
+        if type(input[i]) is bool :
+            if input[i] :
+                input[i] = 'Vrai'
+            else :
+                input[i] = 'Faux'
+
+        total += int(input[i] == output[i])
+    return total
+
+def getSingleScore(input_filename, output_filename)-> dict:
     anwsers = getAnwsersFromAFile(input_filename, True)
     correctedAnwsers = getAnwsersFromAFile(output_filename)
 
-    for i in range(0,max_score) :
-        total += int(anwsers['anwsers'][i] == correctedAnwsers['anwsers'][i])
-
-    anwsers['total'] = total
+    anwsers['total'] = getTotalFromAnwsers(anwsers['anwsers'],correctedAnwsers['anwsers'])
     return anwsers
 
 def writeAnwsersToFile(data, filename) -> str :
@@ -66,7 +75,8 @@ if __name__ == '__main__':
             student = getSingleScore(args.input, args.anwser)
             if args.output :
                 finalOutput = {
-                    'Nom' : [str(student['firstname']) + ' ' + str(student['lastname'])],
+                    'Nom' : [student['lastname']],
+                    'Prenom' : [student['firstname']],
                     'DA' : [student['id']],
                     'Groupe' : [student['group']],
                     'Réponses' : ' ' .join(student['anwsers']),
@@ -75,7 +85,8 @@ if __name__ == '__main__':
 
                 writeAnwsersToFile(finalOutput,str(args.output))
             else : 
-                print("Nom :",student['firstname'] + ' ' +student['lastname']) 
+                print("Nom :",student['lastname']) 
+                print("Prenom :",student['firstname']) 
                 print("DA :", student['id'])
                 print("Groupe :", student['group'])
                 print("réponses :", student['anwsers'])
@@ -91,6 +102,7 @@ if __name__ == '__main__':
         
         filename = os.chdir(PATH_OF_SCRIPT + "/etudiant/")
         nom = []
+        prenom = []
         id = []
         groupe = []
         anwsersOfSingleStudent = []
@@ -99,20 +111,17 @@ if __name__ == '__main__':
         for filename in glob.glob("*.xlsx"):
             anwsers =getAnwsersFromAFile(filename,True)
 
-            nom.append(str(anwsers['firstname']) + ' ' + str(anwsers['lastname']))
+            nom.append(anwsers['lastname'])
+            prenom.append(anwsers['firstname'])
             id.append(anwsers['id'])
             groupe.append(anwsers['group'])
-            anwsersOfSingleStudent.append(' '.join(anwsers['anwsers']))
-            total = 0
-
-            for i in range(0, max_score) :
-                total += int(anwsers['anwsers'][i] == correct_anwsers['anwsers'][i])
-
-            totalOfSingleStudent.append(total)
+            anwsersOfSingleStudent.append(' '.join(str(anwsers['anwsers'])))
+            totalOfSingleStudent.append(getTotalFromAnwsers(anwsers['anwsers'],correct_anwsers['anwsers']))
             
 
         finalOutput = {
             'Nom' : nom,
+            'Prenom' : prenom,
             'DA' : id,
             'Groupe' : groupe,
             'Réponses' : anwsersOfSingleStudent,
