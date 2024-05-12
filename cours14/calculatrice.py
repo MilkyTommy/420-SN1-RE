@@ -1,13 +1,12 @@
-def add(l):
+def addition(l):
     total = l[0]
-    # [1:] précise que l'on veut tout sélectionner à 
-    # l'exception de la première valeur
-    for e in l[1:]: 
+
+    for e in l[1:]:
         total += e
 
     return total
 
-def sous(l):
+def soustraction(l):
     total = l[0]
 
     for e in l[1:]:
@@ -15,15 +14,7 @@ def sous(l):
 
     return total
 
-def div(l):
-    total = l[0]
-
-    for e in l[1:]:
-        total /= e
-
-    return total
-
-def multi(l):
+def multiplication(l):
     total = l[0]
 
     for e in l[1:]:
@@ -31,35 +22,64 @@ def multi(l):
 
     return total
 
-def fact(n):
+def division(l):
+    total = l[0]
+
+    for e in l[1:]:
+        total /= e
+
+    return total
+
+def factorielle(n):
     total = 1
     for i in range(2, n+1):
         total *= i
     return total
 
-choix = input("Addition (+), Soustraction (-), multiplication (x),division (/) ou factorielle (!) :")
 
-nombre = ""
-l = []
+def calcul(l,type):
+    if len(l) == 0:
+        return "Au moin un nombre est nécéssaire"
+    elif len(l) == 1:
+        if type == "+":
+            return addition([l[0],l[0]])
+        elif type == "-":
+            return soustraction([l[0],l[0]])
+        elif type == "*":
+            return multiplication([l[0],l[0]])
+        elif type == "/":
+            return division([l[0],l[0]])
+        elif type == "!":
+            return factorielle(int(l[0]))
+        
+    if type == "+":
+        return addition(l)
+    elif type == "-":
+        return soustraction(l)
+    elif type == "*":
+        return multiplication(l)
+    elif type == "/":
+        return division(l)
+    elif type == "!":
+        return "Une factorielle ne peux pas prenre plusieurs valeurs"
 
-while nombre != "exit":
-    nombre = input("Entre un nombre (exit pour terminer): ")
-    
-    if nombre.isdigit():
-        l.append(float(nombre))
-    elif nombre != "exit":
-        print("ceci n'est pas un nombre !")
+def main():
+    choix = input("Addition (+), Soustraction (-), multiplication (x) ou division (/) :")
 
-reponse = ""
-if choix == "+":
-    reponse = add(l)
-elif choix == "-":
-    reponse = sous(l)
-elif choix == "x":
-     reponse= multi(l)
-elif choix == "/":
-     reponse= div(l)
-elif choix == "!":
-     reponse= fact(l[0])
+    nombre = ""
+    l = []
 
-print(reponse)
+    while nombre != "exit":
+        nombre = input("Entre un nombre (exit pour terminer): ")
+        
+        if nombre.isdigit():
+            l.append(float(nombre))
+        elif nombre != "exit":
+            print("ceci n'est pas un nombre !")
+
+    reponse = calcul(l,choix)
+
+    print(reponse)
+
+if __name__ == "__main__":
+    main()

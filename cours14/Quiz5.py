@@ -38,3 +38,22 @@ def cours_de_prog(reponse : str):
 
 
 cours_de_prog("oui")
+
+ark = [{'nom': 'Tommy', 'genre': 'M', 'surnom': [{'nom': 'Tom'}, {'nom': 'Toto'}]}, {'nom': 'Robert', 'genre': 'O', 'surnom': [{'nom': 'Robby'}, {'nom': 'Bob'}]}, {'nom': 'Béatrice', 'genre': 'F', 'surnom': [{'nom': 'Béa'}, {'nom': 'Bé'}]}]
+
+for personne in ark :
+    for surnom in personne['surnom']:
+        print(surnom['nom'])
+
+def fontion_a_deux_parametres(un,deux):
+    return [un,deux]
+
+fontion_a_deux_parametres(1,2)
+
+
+def true():
+    return not True or True and True or True and not not True
+def false():
+    return "False"
+
+print(true() and True or not false() == "True" or bool("True") and bool("False"))
